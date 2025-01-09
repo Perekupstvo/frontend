@@ -10,6 +10,7 @@ import {
     getExpensesListRequest,
     createExpensesRequest,
     deleteExpensesRequest,
+    deletePhotoCarRequest,
 } from '../../../requests/cars/own';
 import { getBrandsListRequest, getModelsListRequest } from '../../../requests/cars';
 
@@ -53,20 +54,58 @@ const ExpenseElement = ({ expense, onDelete }) => {
     );
 };
 
-const PhotosBlock = () => {
+const PhotosBlock = ({ photos, onUploadPhoto, onDeletePhoto }) => {
+    const [selectedFile, setSelectedFile] = useState(null);
+
+    const handleFileChange = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            setSelectedFile(e.target.files[0]);
+        }
+    };
+
+    const handleUpload = () => {
+        if (selectedFile) {
+            onUploadPhoto(selectedFile);
+            setSelectedFile(null); // Очистка выбранного файла после загрузки
+        }
+    };
+
     return (
         <div>
             <h2>Фотографии</h2>
             <Row>
-                <Col md={3}>
-                    <PrimaryButton className="w-100">
-                        Добавить
+                <Col md={8}>
+                    <Form.Control type="file" accept="image/*" onChange={handleFileChange} />
+                </Col>
+                <Col md={4}>
+                    <PrimaryButton className="w-100" onClick={handleUpload} disabled={!selectedFile}>
+                        Загрузить
                     </PrimaryButton>
                 </Col>
             </Row>
+            <br />
+            <Row className="mb-3">
+                {photos.map((photo, index) => (
+                    <Col key={index} md={3} className="mb-3">
+                        <Card style={{ position: 'relative' }}>
+                            <Card.Img variant="top" src={photo.url} alt={`Фото ${index + 1}`} />
+                            <FaTrash
+                                style={{
+                                    position: 'absolute',
+                                    top: 5,
+                                    right: 5,
+                                    color: 'red',
+                                    cursor: 'pointer',
+                                }}
+                                onClick={() => onDeletePhoto(photo.id)} // Передаем ID фото
+                            />
+                        </Card>
+                    </Col>
+                ))}
+            </Row>
         </div>
     );
-}
+};
 
 const OwnCarsViewPage = () => {
     const navigate = useNavigate();
@@ -98,12 +137,47 @@ const OwnCarsViewPage = () => {
         date: '',
         expense_type: 'repaid', // Значение по умолчанию
     });
+    const [photos, setPhotos] = useState([]);
 
     const handleShowExpenseModal = () => {
         setNewExpense({ description: '', amount: '', date: '', expense_type: 'repaid' }); // Устанавливаем значение по умолчанию
         setShowExpenseModal(true);
     };
     const handleCloseExpenseModal = () => setShowExpenseModal(false);
+
+    const handleUploadPhoto = async (file) => {
+        const formData = new FormData();
+        formData.append("photos", file);
+    
+        try {
+            const response = await updateOwnCarRequest(my_car_id, formData);
+            if (response.ok) {
+                await fetchCarData();
+            } else {
+                const errorData = await response.json();
+                alert('Ошибка при загрузке фотографии: ' + JSON.stringify(errorData));
+            }
+        } catch (err) {
+            console.error('Ошибка при загрузке фотографии:', err);
+            alert('Произошла ошибка при загрузке фотографии.');
+        }
+    };
+    const handleDeletePhoto = async (photoId) => {
+        if (window.confirm('Вы уверены, что хотите удалить эту фотографию?')) {
+            try {
+                const response = await deletePhotoCarRequest(photoId); // Запрос на удаление фото
+                if (response.ok) {
+                    setPhotos(photos.filter((photo) => photo.id !== photoId)); // Обновляем список фото
+                } else {
+                    const errorData = await response.json();
+                    alert('Ошибка при удалении фотографии: ' + JSON.stringify(errorData));
+                }
+            } catch (err) {
+                console.error('Ошибка при удалении фотографии:', err);
+                alert('Произошла ошибка при удалении фотографии.');
+            }
+        }
+    };
 
     const fetchCarData = async () => {
         try {
@@ -112,8 +186,8 @@ const OwnCarsViewPage = () => {
                 const data = await response.json();
                 setFormData({
                     vin: data.vin,
-                    brand: data.brand.id, // ID бренда
-                    model: data.model.id, // ID модели
+                    brand: data.brand.id,
+                    model: data.model.id,
                     year: data.year,
                     mileage: data.mileage,
                     purchase_price: data.purchase_price,
@@ -125,14 +199,15 @@ const OwnCarsViewPage = () => {
                     seller_info: data.seller_info || '',
                     buyer_info: data.buyer_info || '',
                 });
-                return data.brand.id; // Возвращаем ID бренда
+                setPhotos(data.photos); // Сохраняем фотографии
+                return data.brand.id;
             } else {
                 setError('Failed to load car data');
             }
         } catch (err) {
             setError('An error occurred while fetching car data');
         }
-    };
+    };    
 
     const fetchBrands = async () => {
         try {
@@ -498,7 +573,11 @@ const OwnCarsViewPage = () => {
 
             <br />
             <hr />
-            <PhotosBlock />
+            <PhotosBlock
+                photos={photos}
+                onUploadPhoto={handleUploadPhoto}
+                onDeletePhoto={handleDeletePhoto}
+            />
 
 
             <br />

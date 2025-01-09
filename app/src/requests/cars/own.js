@@ -10,6 +10,7 @@ export const OWN_CARS_RETRIEVE = CARS_BASE_URL + VEHICLES + 'retrieve/'
 export const OWN_CARS_CREATE = CARS_BASE_URL + VEHICLES + 'create/'
 export const OWN_CARS_UPDATE = CARS_BASE_URL + VEHICLES + 'update/'
 export const OWN_CARS_DELETE = CARS_BASE_URL + VEHICLES + 'delete/'
+export const OWN_CARS_PHOTO_DELETE = CARS_BASE_URL + VEHICLES + 'photo/delete/'
 
 export const OWN_EXPENSES_LIST = CARS_BASE_URL + EXPENSES + 'list/'
 export const OWN_EXPENSES_CREATE = CARS_BASE_URL + EXPENSES + 'create/'
@@ -51,6 +52,13 @@ export const updateOwnCarRequest = async (car_id, data) => {
  */
 export const deleteOwnCarRequest = async (car_id) => {
 	return await Request.send({method: DELETE, url: OWN_CARS_DELETE + `${car_id}/`});
+};
+
+/**
+ * Запрос для фото машины
+ */
+export const deletePhotoCarRequest = async (photo_id) => {
+	return await Request.send({method: DELETE, url: OWN_CARS_PHOTO_DELETE + `${photo_id}/`});
 };
 
 /**
