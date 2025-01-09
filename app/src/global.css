@@ -1,0 +1,13 @@
+:root {
+  --background-color: #474448;
+  --text-color: #F1F0EA;
+  --button-bg: #2D232E;
+  --button-text: #E0DDCF;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+}

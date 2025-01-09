@@ -1,0 +1,32 @@
+/* Общие стили */
+::-webkit-scrollbar {
+    width: 12px; /* ширина скроллбара в браузерах на основе Chromium, таких как Chrome и Safari */
+}
+
+::-webkit-scrollbar-thumb {
+background-color: #bcbcbc; /* цвет ползунка */
+border-radius: 3px; /* радиус углов ползунка */
+}
+
+::-webkit-scrollbar-track {
+background-color: #dad8d8; /* цвет трека (фона) */
+}
+
+/* Стили для Firefox */
+.scrollbar-moz {
+scrollbar-color: #888 #f1f1f1; /* цвет ползунка и трека */
+scrollbar-width: thin; /* ширина скроллбара */
+}
+
+/* Стили для Internet Explorer и Microsoft Edge */
+.scrollbar-ms {
+scrollbar-base-color: #888; /* цвет ползунка */
+scrollbar-face-color: #888; /* цвет ползунка */
+scrollbar-shadow-color: #f1f1f1; /* цвет трека (фона) */
+scrollbar-highlight-color: #f1f1f1; /* цвет трека (фона) */
+scrollbar-arrow-color: #f1f1f1; /* цвет стрелок на кнопках */
+scrollbar-3dlight-color: #f1f1f1; /* цвет трека (фона) */
+scrollbar-darkshadow-color: #f1f1f1; /* цвет трека (фона) */
+scrollbar-track-color: #f1f1f1; /* цвет трека (фона) */
+}
+  
